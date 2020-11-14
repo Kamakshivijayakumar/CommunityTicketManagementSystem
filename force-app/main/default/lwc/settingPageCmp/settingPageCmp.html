@@ -1,0 +1,22 @@
+<template>
+
+    <lightning-layout  style="margin: -45px 0px 0px -28px;">
+         <lightning-layout-item size="2">
+            <div class="verticalNavCls">
+                <c-vertical-navigation-cmp slds-active='settings'></c-vertical-navigation-cmp>
+             </div>
+         </lightning-layout-item>
+         <lightning-layout-item size="10" style='width:1135px'>
+            <div class="settingPageHeaderCls">
+              <p style="text-align: center;margin-bottom:5px"> SETTINGS </p>
+                 <div class="slds-clearfix">
+                   <div class="slds-float_right" style='margin:-16px 66px 0px 0px '> 
+                       <lightning-button-icon   icon-name='standard:home' name='homePage' title="Home Page" variant='brand' onclick={openHomePage}></lightning-button-icon>
+                   </div>
+                 </div>
+            </div>
+        </lightning-layout-item>
+    </lightning-layout>
+
+    
+</template>

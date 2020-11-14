@@ -1,0 +1,57 @@
+<template>
+
+    <div class="slds-p-around_medium lgc-bg" style="background-color: rgba(243, 242, 242, 1); border-radius: 8px; text-align:center;margin-top:-28px">
+        <lightning-tile type="media">
+            <!-- <lightning-icon slot="media" icon-name="standard:groups"></lightning-icon>-->
+            <lightning-layout>
+                <lightning-layout-item size='10'>
+                    <h2 class="slds-text-heading_medium slds-m-bottom_medium" style="margin-left: 82px;"> PROJECTS </h2>
+                    </lightning-layout-item>
+                <lightning-layout-item size='2'>
+                    <!--Button for New Project-->
+                    <div class="slds-clearfix">
+                        <div class="slds-float_right">
+                            <lightning-button   label='New Project' name='newProject'  variant='brand' onclick={newProjectMethod}></lightning-button>
+                        </div>
+                    </div>
+                </lightning-layout-item>
+            </lightning-layout>
+
+        </lightning-tile>
+    </div>
+
+    <div class="slds-p-around_none slds-m-top_x-small slds-m-bottom_medium slds-m-horizontal_none">
+        <lightning-layout  multiple-rows='true' >
+            <template for:each={projectsList.data} for:item="project" for:index="index">
+                <lightning-layout-item padding="around-small"  size="2"  key={project.Id}>
+                    <a href={url} onclick={handleFolderClick} data-item={project.Project_Number__c}>
+                        <img src={folderLogo}>
+                        <div    class="folderTextCls" style="margin-right: 75px;">{project.Name}</div>
+                    </a>   
+                </lightning-layout-item>
+            </template>
+        </lightning-layout>               
+    </div>
+
+    <!-- Model view for new Project-->
+   <template if:true={newProjectFlag}>
+        <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+            <div class="slds-modal__container">
+                <!-- modal header start -->
+                <header class="slds-modal__header">
+                    <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close" onclick={closeModal}>
+                        <lightning-icon icon-name="utility:close"  alternative-text="close"  variant="inverse" size="small" ></lightning-icon>
+                        <span class="slds-assistive-text">Close</span>
+                    </button>
+                    <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate noTicketCls">Create New Project</h2>
+                </header>
+                <!-- modal body start -->
+                <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                    <lightning-record-form object-api-name='Project__c' fields={projectFields} columns='2' onsuccess={newlyCreateProject}></lightning-record-form>
+                 </div>
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </template>
+    
+</template>

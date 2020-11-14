@@ -1,0 +1,54 @@
+.tktDetailPageHeaderCls
+ {
+    height: 3rem;
+    background-color: rgb(46,63,80);
+    color:white;
+    width: 1369px;
+    margin:-30px 0px 0px  -15px;
+ }
+
+.attachListCls
+ {   
+    height: 3rem;
+    background-color: #f4f6f9;
+    /*padding: 1rem;*/
+    border: 1px solid #d8dde6;
+    border-radius: 10px;
+    display: flex;
+    margin-left: -105px;
+    width: 55rem;
+ }
+
+
+.emailListCss
+ {
+    overflow:hidden;
+    background-color: #f4f6f9;
+    /*padding: 1rem;*/
+    border: 1px solid #d8dde6;
+    border-radius: 10px;
+    width: 55rem;   
+}
+
+.notesListCls
+ {   
+   /*  height: 9rem;*/
+   overflow:auto;
+   background-color: #f4f6f9;
+   /*padding: 1rem;*/
+   border: 1px solid #d8dde6;
+   border-radius: 10px;
+   width: 55rem;
+
+ } 
+
+.attachLinkCls
+ {
+    color:black;
+    font-weight: bold;
+ }
+
+.attachLinkCls:hover
+ {
+   color:blue;
+ }

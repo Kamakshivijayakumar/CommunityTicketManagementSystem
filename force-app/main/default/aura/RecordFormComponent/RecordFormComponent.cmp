@@ -1,0 +1,22 @@
+<aura:component implements="flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,force:appHostable" access="global" >
+    <aura:attribute name="recordId" type="string" default="0017F00000HOHWVQA5"/>
+    <aura:attribute name="record" type="Object" default="0017F00000HOHWVQA5"/>
+    <aura:attribute name="simpleRecord" type="Account"/>
+    <aura:attribute name="recordError" type="String"/>
+    
+    <force:recordData aura:Id="editRec"
+					  recordId="{!v.recordId}"
+					  targetRecord="{!v.record}"
+                      targetFields="{!v.simpleRecord}"
+                      targetError="{!v.recordError}"
+                      layoutType="FULL"
+                      mode="EDIT"/>
+    <lightning:navigation aura:Id="navId"/>
+    <lightning:input aura:id="recordName" name="Name" label="Name" value="{!v.simpleRecord.Name}" required="true"/>
+ 	<lightning:input aura:id="phone" Name="Phone" label="Phone" value="{!v.simpleRecord.Phone}" type="phone"/>
+ 	<lightning:input aura:id="Type" Name="Revenue" label="Revenue" value="{!v.simpleRecord.AnnualRevenue}" type="currency"/>
+ 
+ 	<lightning:button label="Save Record" onclick="{!c.handleSave}" variant="brand" class="slds-m-top--medium"/>
+
+		
+</aura:component>

@@ -1,0 +1,25 @@
+<aura:component implements="flexipage:availableForAllPageTypes,forceCommunity:availableForAllPageTypes" access="global" >
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <aura:attribute name="backgroundImageURL" type="String" default=""/>
+   <!-- <div style="{!'background:' + v.backgroundColor + ' url(' + v.backgroundImageURL +') no-repeat;background-position: center;background-size: cover;'}">
+	</div> -->
+    <div style="{!'position: relative; min-height: 100vh; background:' + v.backgroundColor + ' url(' + v.backgroundImageURL +') no-repeat;background-position: center;background-size: cover;'}">
+	</div>
+    <lightning:layout>
+        <!--<div align="center"> -->
+        	<lightning:layoutItem size="12" padding="around-small" class="loginCls">
+                <fieldset class="slds-box slds-theme--default slds-container--medium">
+                    <legend align="center" id="loginForm" class="slds-text-heading_small slds-p-vertical_x-medium login-heading">
+                        <div class="slds-p-top_large">Login Form</div>
+                    </legend>
+                    <div class="slds-form slds-form_stacked">
+                        <lightning:input label="Username" name="Username" type="email" placeholder="Enter your Username"/>
+                        <lightning:input label="Password" name="password" type="password" placeholder="Enter your Password"/>
+                        <div style="justify-content:center;display:flex;align-items:center"><lightning:button variant="brand" label="Login" title="Brand action" onclick="{! c.handleClick }"/></div>
+                    </div>
+                </fieldset>
+        	</lightning:layoutItem>
+       <!-- </div> -->
+    	
+    </lightning:layout>
+</aura:component>

@@ -1,0 +1,50 @@
+.verticalNavCls{
+  /* width: 234px;
+    height: 100vh;
+    position: fixed;   
+    border: 1px solid #8e8e8e;
+    /*box-shadow: 5px 10px 8px #888888;*/
+    background-color: #00396B;
+    height:645px;
+
+}
+
+.chatBotPageHeaderCls{
+    height: 3rem;
+  /*  margin-left: 200px; */
+    background-color: rgb(46,63,80);
+    color:white;
+   /* width: 1150px;*/
+}
+.scrolledCss{
+  height:535px;
+  width: 900px;
+  overflow-y: scroll;
+
+}
+
+
+
+.chatCss{
+  overflow:auto;
+      background-color: #c7d5e8;
+      border-style: solid;
+      border-color: #c7d5e8;
+      border-radius: 9px;
+  margin-left: 23px;
+  margin-top: 10px;
+  display:inline-block;
+  max-width: 550px;
+      
+  }
+
+
+  div.wrap {
+    display: table;
+height: 536px;
+  }
+
+div.cell {
+    display: table-cell;
+    vertical-align: bottom;
+}

@@ -1,0 +1,20 @@
+.verticalNavCls
+ {
+  /*  width: 221px;
+    height: 100vh;
+    position: fixed;
+    border: 1px solid #8e8e8e;
+    /*box-shadow: 5px 10px 8px #888888;*/
+    background-color: #00396B;
+    height:645px;
+
+ }
+
+.settingPageHeaderCls
+ {
+    height: 3rem;
+  /*  margin-left: 200px; */
+    background-color: rgb(46,63,80);
+    color:white;
+   /* width: 1150px;*/
+ }

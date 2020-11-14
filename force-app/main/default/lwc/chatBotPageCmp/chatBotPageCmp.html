@@ -1,0 +1,119 @@
+<template>
+
+  <lightning-layout  style="margin: -45px 0px 0px -27px;">
+     <lightning-layout-item size="2">
+        <div class="verticalNavCls">
+          <c-vertical-navigation-cmp slds-active='chatBot'></c-vertical-navigation-cmp>
+        </div>
+    </lightning-layout-item>
+
+    <lightning-layout-item size="10" style='width:1135px'>
+       <div class="chatBotPageHeaderCls">
+        <p style="text-align: center;margin-bottom:5px"> CHAT BOT </p>
+        <div class="slds-clearfix">
+          <div class="slds-float_right" style='margin:-16px 66px 0px 0px '> 
+            <lightning-button-icon   icon-name='standard:home' name='homePage' title="Home Page" variant='brand' onclick={openHomePage}></lightning-button-icon>
+          </div>
+        </div>
+      </div>
+
+      <div style='border-style: solid;border-color: #c9c9de;background-color: #c9c9de;height:3rem'>
+        <lightning-input  name='searchUsers'  type='search' placeholder='Search Users' onchange={searchUseForChatrMethod}  style="margin:-16px 0px -22px 0px ;width:208px"></lightning-input>
+        <div style="margin-top:-28px;margin-left:46px">
+          <lightning-icon icon-name='standard:avatar' style='height:25px;margin-left:225px' size='small'></lightning-icon>
+          <div style='margin:-32px 0px 0px 252px;text-transform:capitalize;font-size:23px;'>{userName}</div>
+        </div>
+      </div>
+
+
+      <lightning-layout>
+        <lightning-layout-item size='3' style="margin-left:3px">
+          <div class="scrolledCss" style='height:549px;width:221px;background-color:#d6e0ec'>
+            <div class="demo-only" style="width:320px">
+              <nav class="slds-nav-vertical slds-nav-vertical_compact" aria-label="Sub page">
+                <div class="slds-nav-vertical__section">
+                  <ul aria-describedby="entity-header">
+                    <template for:each={listOfOwner} for:item='user'>
+                      <div  key={user}> 
+                      <template if:true={user.ischeck}>
+                        <li class="slds-nav-vertical__item slds-is-active"  data-id={user.value}  onclick={selectedUserToChat} >
+                          <a href="javascript:void(0);" class="slds-nav-vertical__action" style='text-transform: capitalize;text-align:center;font-size:16px;' aria-current="true">
+                          <lightning-icon icon-name='standard:avatar' style='height:25px;margin:5px' size='small'></lightning-icon>{user.label}</a>
+                        </li>
+                    </template>
+
+                    <template if:false={user.ischeck}>
+                      <li class="slds-nav-vertical__item "  data-id={user.value}  onclick={selectedUserToChat}>
+                        <a href="javascript:void(0);" class="slds-nav-vertical__action"  style='text-transform: capitalize;text-align:center;font-size:16px;'  aria-current="true">
+                        <lightning-icon icon-name='standard:avatar' style='height:25px;margin:5px' size='small'></lightning-icon>{user.label}</a>
+                      </li>
+                    </template>
+                    </div>
+                    </template>
+                  </ul>
+                </div>
+              </nav>
+            </div>
+          </div>
+          </lightning-layout-item>
+        <lightning-layout-item size='9' style="margin-left: -54px;"> 
+
+          <template if:false={isShowChatInputAndMessages}>
+            <p style="font-size: 15px; text-align:center;margin:19px 0px 0px 45px;">PLEASE SELECT USER TO CHAT</p>
+          </template>
+
+          <template if:true={isShowChatInputAndMessages}>
+              <div class="slds-scrollable_y" style="height:535px; width: 900px;" >
+                  <div class="wrap">
+                      <div class='cell'>
+                        <div style="margin-top:19px">
+                          <template if:true={isShowChatMessages}>
+                            <template for:each={listOfChatBotMessages} for:item='chatbot'>
+                              <div key={chatbot} >
+                                <template if:true={chatbot.isSender}>
+                                  <div class="slds-clearfix">
+                                    <div class="slds-float_right"> 
+                                      <div class="chatCss" style=" color:white; background-color:rgb(15, 135, 210);border-color:rgb(15 ,135, 210);">
+                                        <div style="margin: 0px 0px 0px 0px;text-align:right;font-size:12px">{chatbot.createdDate}</div>
+                                        <div style="font-size: 18px;margin:6px 39px 0px 0px;">{chatbot.chat}</div>
+                                      </div>
+                                    </div>
+                                  </div>
+                                  </template>
+                                <template if:false={chatbot.isSender}>
+                                  <div class="chatCss" >
+                                    <div style="margin: 0px 0px 0px 0px;font-size:12px;text-align:right;">{chatbot.createdDate}</div>
+                                    <div style="font-size: 18px;margin:0px 39px 0px 0px;">{chatbot.chat}</div>
+                                  </div>
+                                </template>
+                              </div>
+                            </template>
+                          </template>
+
+                        <template if:false={isShowChatMessages}>
+                          <p style="font-size: 15px; text-align:center;margin:19px 0px 0px 45px;">NO PREVIOUS CHAT FOUND </p>
+                        </template> 
+
+                        <lightning-layout >
+                          <lightning-layout-item style="margin:0px 0px 0px 55px;" >
+                            <lightning-textarea   placeholder='Type a new message' style='vertical-align:bottom;width:690px;'   value={chatMessage} onchange={getMessageValueMethod}></lightning-textarea>
+                          </lightning-layout-item>
+                          <lightning-layout-item style="margin:28px 0px 0px 15px;">
+                            <lightning-button label='Send'  variant='brand' onclick={sendedMessage}></lightning-button>
+                          </lightning-layout-item>
+                        </lightning-layout>
+                      </div>
+                    </div>
+                  </div>        
+               </div>
+            </template>
+          </lightning-layout-item> 
+      </lightning-layout>
+    </lightning-layout-item>
+  </lightning-layout>
+
+</template>
+
+
+
+

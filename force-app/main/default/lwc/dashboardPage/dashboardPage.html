@@ -1,0 +1,127 @@
+<template>
+
+    <lightning-layout>
+        <lightning-layout-item flexibility="auto" size="2">
+            <div class="verticalNavCls" style='margin:-42px 0px 0px -27px'>
+                <c-vertical-navigation-cmp  slds-active='dashboard'></c-vertical-navigation-cmp>
+            </div>
+        </lightning-layout-item>
+        <lightning-layout-item flexibility="auto" size="10">
+            <div class="dashBoardPageHeaderCls">
+                DASHBORD
+                <div class="slds-clearfix">
+                <div class="slds-float_right" style='margin:-12px 66px 0px 0px '> 
+                        <lightning-button-icon   icon-name='standard:home' name='homePage' title="Home Page" variant='brand' onclick={openHomePage}></lightning-button-icon>
+
+                    </div>
+                </div>
+            </div>
+
+            <div style="margin-left:469px;margin-top:10px">
+                <div class="select-box-owner" onclick={openOnwerFilter}>    
+                    <div class="options-container-owner" style="position: absolute;display: block;width: 210px;text-align: left;" >
+                            <lightning-layout style=' margin-top:-24px;'>
+                                <lightning-layout-item >
+                                    <lightning-input type='search' style='color:black; margin-top:45px;' value={searchOwnerVal} placeholder="Search Owners" onchange={getOwnerBySearch} ></lightning-input>
+                                </lightning-layout-item>
+                                <lightning-layout-item size="3" style='margin-top:65px; margin-left:15px' >
+                                    <lightning-button-icon icon-name='utility:refresh'  variant='brand' onclick={refreshOwnerFilter}></lightning-button-icon>
+                                </lightning-layout-item>
+                            </lightning-layout>
+                            <template if:true={listOfOwner}>
+                                <template for:each={listOfOwner} for:item="item">
+                                    <div class="option-owner" key={item}   style='text-transform: capitalize;'>
+                                        <input type="checkbox" value={item.Id} checked={item.isCheck} onchange={getListFilteredOwner}/>{item.Name}  
+                                    </div> 
+                                </template>
+                            </template>
+
+                            <template if:false={listOfOwner}>
+                                <p class="noTicketCls">No users Found  To Display</p>
+                            </template>
+                    </div>
+                    <div class="selected-owner" >
+                        <template if:false={isSelectOnwerItem}> 
+                            <p style='text-align:center;'>Filter Users</p>
+                        </template>
+                        <template if:true={isSelectOnwerItem} >
+                            <p style='text-transform: capitalize;text-align:center;'>{firstItemInOwnerselectList}</p>
+                        </template>    
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="app-container " style="margin-top:-14px;height:540px"   >
+                <div class="slds-m-top_large slds-p-left_small slds-p-right_small slds-grid slds-gutters  space"  style="margin-left: 10px;">
+                    <div class=" bg-primary slds-p-around_small slds-m-around_small" style="width: 180px;height:78px;" >
+                        <div class="slds-text-align_center slds-text-heading_medium white-color"> Open </div>
+                        <div class="slds-text-align_center slds-text-heading_large white-color">{totalOpenStages}</div>
+                    </div>
+                    <div class=" bg-warning slds-p-around_small slds-m-around_small" style="width: 180px;height:78px;">
+                        <div class="slds-text-align_center slds-text-heading_medium white-color">  Pending </div>
+                        <div class="slds-text-align_center slds-text-heading_large white-color">{totalPendingStages}</div>
+                    </div>
+                    <div class="slds-p-around_small slds-m-around_small" style="width: 180px;height:78px;background-color:blueviolet">                                             
+                        <div class="slds-text-align_center slds-text-heading_medium white-color"> Resolved </div>
+                        <div class="slds-text-align_center slds-text-heading_large white-color">{totalResolvedStages}</div>
+                    </div>
+                    <div class=" bg-danger slds-p-around_small slds-m-around_small" style="width: 268px;height:78px;">
+                        <div class=" slds-text-heading_medium white-color"> Waiting On Customer  </div>
+                        <div class="slds-text-align_center slds-text-heading_large white-color">{totalWaitingOnCustomerStages}</div>
+                    </div>
+                    <div class=" bg-secondary slds-p-around_small slds-m-around_small" style="width: 180px;height:78px;">
+                        <div class="slds-text-align_center slds-text-heading_medium white-color"> Others</div>
+                        <div class="slds-text-align_center slds-text-heading_large white-color"> {totalOtherStages}</div>
+                    </div>
+                </div>
+                <div class="slds-m-top_large slds-p-left_small slds-p-right_small slds-grid slds-gutters  space"  >
+                    <div class=" bg-info slds-p-around_small slds-m-around_small" style="width: 226px;height:78px;margin: -14px 0px 0px 237px;">
+                        <div class="slds-text-align_center slds-text-heading_medium white-color">Total Tickets</div>
+                        <div class="slds-text-align_center slds-text-heading_large white-color"> {totalNoOfTickets}</div>
+                    </div>
+                    <div class=" bg-success slds-p-around_small slds-m-around_small" style="height:78px;width:226px;margin: -14px 237px 0px 0px;">
+                        <div class="slds-text-align_center slds-text-heading_medium white-color"> Closed </div>
+                        <div class="slds-text-align_center slds-text-heading_large white-color">{totalClosedStages}</div>
+                    </div>
+                </div>
+
+                <template if:false={isSelectOnwerItem}>
+                    <div class="chartContainer"  style='margin-top:49px' lwc:dom="manual"></div>
+                </template>
+
+                <template if:true={isSelectOnwerItem}>
+                    <table class="table table-bordered " style='margin-top:49px'>
+                        <thead>
+                            <tr>					
+                                <th>User Name</th>
+                                <th>Open</th>
+                                <th>Pending</th>
+                                <th>Resolved</th>
+                                <th>Waiting On Customer</th>
+                                <th>Others</th>
+                                <th>Total Tickets</th>
+                                <th>Closed</th>
+                            </tr>
+                        </thead> 
+
+                        <tbody>
+                            <template for:each={listOfTicketPerUser}  for:item="item"> 
+                                <tr key={item}>
+                                    <td class="countryName">{item.UserName}</td>
+                                    <td>{item.totalOpenStageperUser}</td>
+                                    <td>{item.totalPendingStageperUser}</td>
+                                    <td >{item.totalResolvedStageperUser}</td>
+                                    <td >{item.totalWaitingOnCustomerStageperUser}</td>
+                                    <td >{item.totalOtherStageperUser}</td>
+                                    <td>{item.totalTicketPerUser}</td>
+                                    <td>{item.totalClosedStageperUser}</td>
+                                    </tr>
+                            </template>
+                        </tbody>
+                    </table>
+                </template>
+            </div>
+        </lightning-layout-item>
+    </lightning-layout>
+</template>

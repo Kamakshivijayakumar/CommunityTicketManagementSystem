@@ -1,0 +1,270 @@
+<apex:page sidebar="false" controller="DataManager_controller">
+    <apex:stylesheet value="{!URLFOR($Resource.normalize)}"/>
+    <apex:stylesheet value="{!URLFOR($Resource.style)}"/>
+    <apex:stylesheet value="//netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.css" />
+    
+    <apex:form id="form_wrapper" styleClass="form_wrapper">
+        <apex:outPutPanel id="steps">
+            <apex:actionfunction name="setStep1" action="{!setStep1}" reRender="form_wrapper" />
+            <apex:actionfunction name="setStep2" action="{!setStep2}" reRender="form_wrapper" />
+            <apex:actionfunction name="setStep3" action="{!setStep3}" reRender="form_wrapper" />
+            
+            <div id="steps">
+                <div onclick="loading(); return setStep(0);" class="step {! step1 }" data-desc="Refresh Sales Data">
+                    <apex:outputPanel styleClass="icon-ok" rendered="{! step > 0 }"></apex:outputPanel>
+                </div>
+                <div onclick="loading(); return setStep(1);" class="step {! step2 }" data-desc="Download Trailhead Dataflow">
+                    <apex:outputPanel styleClass="icon-ok" rendered="{! step > 1 }"></apex:outputPanel>
+                </div>
+                <div onclick="loading(); return setStep(2);" class="step {! step3 }" data-desc="Download Quota Data">
+                    <apex:outputPanel styleClass="icon-ok" rendered="{! step > 2 }"></apex:outputPanel>
+                </div>
+            </div>
+        </apex:outPutPanel>
+        
+        <div class="loadingWrapper" style="display:none;" id="loading"><div class="loadingHexagon"></div></div>
+        
+        <apex:outPutPanel layout="block" id="datablock" styleClass="datablock" rendered="{! step == 0 }">
+            <apex:outPutPanel layout="block" id="start_panel" rendered="{!job_id == null}">
+                <apex:outPutPanel layout="block" id="error_panel" rendered="{! error != null }" styleClass="loading_panel">
+                    <p>An error occured in your last data refresh.</p>
+                    
+                    <p class="error">{! error }</p>
+                    
+                    <p>Please retry again or start a discussion in the <a href="https://developer.salesforce.com/forums/#!/feedtype=RECENT&criteria=ALLQUESTIONS" target="_blank">Developers Forum</a>.</p>
+                </apex:outPutPanel>
+                
+                <apex:outPutPanel layout="block" id="data_status" rendered="{!error == null}">
+                    <apex:outPutPanel layout="block" rendered="{!clean_data}">
+                        <p class="success">Your data is up to date. <a onclick="$('.data_details').toggle();">(see details)</a></p>
+                    </apex:outPutPanel>
+                    <apex:outPutPanel layout="block" rendered="{!!clean_data}">
+                        <p class="error">Your data is not refreshed. Please click the button below <a onclick="$('.data_details').toggle();">(see details)</a></p>
+                    </apex:outPutPanel>
+                    
+                    <ul class="data_details">
+                        <li>
+                            <apex:outPutPanel layout="block" rendered="{!act_days_diff == 0}">
+                                <span class="true">Your {!opps_count} opportunities and {!cases_count} cases are centered around today.</span>
+                            </apex:outPutPanel>
+                            <apex:outPutPanel layout="block" rendered="{!act_days_diff > 0}">
+                                <span class="false">Your {!opps_count} opportunities and {!cases_count} cases are centered around {! sref_date }, so {! act_days_diff } day(s) ago.</span>
+                            </apex:outPutPanel>
+                            <apex:outPutPanel layout="block" rendered="{!act_days_diff == -1}">
+                                <span class="false">You have have no DTC Opportunity or Cases.</span>
+                            </apex:outPutPanel>
+                        </li>
+                        <li class="{! accounts_count > 0 }">You have {!accounts_count} accounts.</li>
+                        <li class="{! opplis_count > 0 }">You have {!opplis_count} opportunity line items.</li>
+                        <li class="{! opphists_count > 0 }">You have {!opphists_count} opportunity histories.</li>
+                        <li class="{! events_count > 0 }">You have {!events_count} events.</li>
+                        <li class="{! tasks_count > 0 }">You have {!tasks_count} tasks.</li>
+                    </ul>
+                </apex:outPutPanel>
+                
+                <apex:commandLink action="{!startDataRefresh}" value="Refresh DTC Data" reRender="form_wrapper" onclick="loading();" styleClass="btn-action"/>
+            </apex:outPutPanel>
+            
+            <apex:outPutPanel layout="block" id="loading_panel" rendered="{!job_id != null}" styleClass="loading_panel">
+                <div>
+                    <table>
+                        <tr>
+                            <td>
+                                <div class="loadingWrapper"><div class="loadingHexagon"></div></div>
+                            </td>
+                            <td>
+                                <h2>Import In Progress. Please Wait...</h2>
+                                
+                                <ol class="jobs">
+                                    <li class="{!cleanup_isrunning}">Cleaning up the org and loading accounts</li>
+                                    <li class="{!opp_isrunning}">Loading DTC Sales and Service Cloud data</li>
+                                    <li class="{!opprel_isrunning}">Loading DTC products and histories</li>
+                                    <li class="{!activity_isrunning}">Loading DTC activities (events, tasks and telephony)</li>
+                                </ol>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </apex:outPutPanel>
+            
+            <apex:actionPoller action="{!updateJobsData}" enabled="{!job_id != null}" reRender="datablock" interval="5"/>
+        </apex:outPutPanel>
+        
+        <apex:outPutPanel layout="block" id="files_panel" styleClass="files_panel">
+            <apex:actionfunction name="updateQuota" action="{!updateQuota}" reRender="quota" />
+            <apex:actionfunction name="updateDataflow" action="{!updateDataflow}" reRender="form_wrapper"/>
+            <apex:actionfunction name="updateDataflowNames" action="{!updateDataflowNames}" reRender="dataflow"/>
+            
+            <apex:outPutPanel layout="block" id="dataflow" rendered="{! step == 1 }">
+                <apex:outPutPanel layout="block" id="app_selector" rendered="{!dataflowNames != null}">
+                    <p>
+                        <label>Choose your SalesWave app: </label>
+                        <apex:selectList id="dataflowList" value="{!dataflowName}" multiselect="false" size="1" onchange="loadDataflow()">
+                             <apex:selectOption itemValue="" itemLabel="---"/>
+                            <apex:selectOptions value="{!dataflowNames}"></apex:selectOptions>
+                        </apex:selectList>
+                    </p>
+                
+                    <apex:outPutPanel layout="block" id="dataflow_gen" rendered="{!dataflow.Id == null && dataflowName != ''}">
+                        Generating Dataflow for {! dataflowName }...
+                    </apex:outPutPanel>
+                </apex:outPutPanel>
+                
+                <apex:outPutPanel layout="block" id="no_app" rendered="{!dataflowNames == null}">
+                    No SalesWave App found.
+                </apex:outPutPanel>
+                
+                <apex:outPutPanel layout="block" id="dataflow_down" rendered="{!dataflow.Id != null}">
+                    <a href="/servlet/servlet.FileDownload?file={!dataflow.id}" target="_blank" download="{!dataflow.name}" class="btn-action">Download Dataflow for {!dataflow.name}</a>
+                </apex:outPutPanel>
+            </apex:outPutPanel>
+            
+            <apex:outPutPanel layout="block" id="quota" rendered="{! step == 2 }">
+                <apex:outPutPanel layout="block" id="quota_gen" rendered="{!quota.Id == null}">
+                    Generating Quota...
+                </apex:outPutPanel>
+                
+                <apex:outPutPanel layout="block" id="quota_down" rendered="{!quota.Id != null}">
+                    <a href="/servlet/servlet.FileDownload?file={!quota.id}" target="_blank" download="{!quota.name}" class="btn-action">Download Quota CSV</a>
+                </apex:outPutPanel>
+            </apex:outPutPanel>
+            
+        </apex:outPutPanel>
+    </apex:form>
+    
+    <p class="version">Trailhead Data Manager - v2.4</p>
+    
+    <apex:includeScript value="//code.jquery.com/jquery-1.12.0.min.js"  />
+    <apex:includeScript value="//code.jquery.com/jquery-migrate-1.2.1.min.js"  />
+    <script>
+    // -----------------------------------------------------------
+    // 				Main (ondocumentready)
+    // -----------------------------------------------------------
+    
+    $(function () {
+        console.log('Init page');
+        // Make sure the setting is right
+        createSiteSettings();
+        
+        // DEBUG!! Todo: include it in the url!
+        // setStep(2);
+    });
+    
+    // -----------------------------------------------------------
+    // 				UI Steps functions
+    // -----------------------------------------------------------
+    
+    var setStep = function(id) {
+        switch(id) {
+            case 0:
+                setStep1();
+                break;
+            case 1:
+        		updateDataflowNames();
+                setTimeout(setStep2, 2500);
+                break;
+            case 2:
+                setStep3();
+                setTimeout(updateQuota, 2500);
+                break;
+        }
+        return false;
+    };
+    
+    var loadDataflow = function() {
+        loading();
+        updateDataflow();
+    }
+    
+    var loading = function() {
+        // Display loading
+        $('#loading').show();
+        
+        // Hide all parts
+        $('.datablock').hide();
+        $('.files_panel').hide();
+    }
+    
+    
+    // -----------------------------------------------------------
+    // 				RemoteSiteSetting Set-up
+    // -----------------------------------------------------------
+    
+    var org = "{!orgUri}";
+    var instance = org.split(".")[0]; if(instance == "gs0") instance = "gus";
+    var vfPrefix = location.href.indexOf("wavelabs.") > -1 ? "wavelabs" : "c";
+    var looksLikeSDO = location.href.indexOf(org) > -1;
+    
+    var fullVFPath = 'https://' + vfPrefix + '.' + instance + '.visual.force.com';
+    if(instance == "gus") instance = "gs0";
+    var orgPath = 'https://' + instance + '.salesforce.com';
+    if(looksLikeSDO) {
+        fullVFPath = 'https://' + org; // SDOs have VF on same domain as org
+    }
+    
+    var customDomain = false;
+    if(org.indexOf('.my.salesforce.com') > -1) {
+        fullVFPath = org;
+        customDomain = true;
+    }
+    
+    // Create the VF Remote Site first using this AJAX call (e.g. https://wavelabs.[host].visual.force.com)
+    // Then use the controller to create the instance site (e.g. https://[host].salesforce.com)
+    // Why? Javascript can't create the latter, and Controller can't create the former (good times)
+    function createSiteSettings() {
+        var binding = new XMLHttpRequest();
+        var request =
+            '<?xml version="1.0" encoding="utf-8"?>' +
+            '<env:Envelope xmlns:env="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">'+
+            '<env:Header>' +
+            '<urn:SessionHeader xmlns:urn="http://soap.sforce.com/2006/04/metadata">' +
+            '<urn:sessionId>{!$Api.Session_ID}</urn:sessionId>' +
+            '</urn:SessionHeader>' +
+            '</env:Header>' +
+            '<env:Body>' +
+            '<createMetadata xmlns="http://soap.sforce.com/2006/04/metadata">' +
+            '<metadata xsi:type="RemoteSiteSetting">' +
+            '<fullName>DataManager_OrgVF_URL</fullName>' +
+            '<description></description>' +
+            '<disableProtocolSecurity>false</disableProtocolSecurity>' +
+            '<isActive>true</isActive>' +
+            '<url>' + orgPath + '</url>' +
+            '</metadata>' +
+            '</createMetadata>' +
+            '</env:Body>' +
+            '</env:Envelope>';
+        binding.open('POST', fullVFPath + '/services/Soap/m/31.0');
+        binding.setRequestHeader('SOAPAction','""');
+        binding.setRequestHeader('Content-Type', 'text/xml');
+        binding.onreadystatechange =
+            function() {
+            if(this.readyState==4) {
+                var parser = new DOMParser();
+                var doc  = parser.parseFromString(this.response, 'application/xml');
+                var errors = doc.getElementsByTagName('errors');
+                var messageText = '';
+                for(var errorIdx = 0; errorIdx < errors.length; errorIdx++)
+                    messageText += errors.item(errorIdx).getElementsByTagName('message').item(0).innerHTML + '\n';
+                if(messageText.length > 0 && messageText.indexOf("already exists") == -1) {
+                    // TODO buttons:
+                    // var elDivBtn = document.getElementById("divBtn");
+                    // elDivBtn.innerHTML = "Error creating Remote Site Settings: " + messageText;
+                    console.error("Error creating Remote Site Settings: " + messageText);
+                } else {
+                    if(!customDomain && !looksLikeSDO & messageText.length == 0) {
+                        console.error('Needed to user APEX dril down: createSiteSettingsAPEX()');
+                    } else {
+                        // TODO !!!
+                        // var elBtn = document.getElementById("btnCreateSettings");
+                        // elBtn.disabled = true;
+                        // elBtn.innerHTML = "Done! You can start using any of the tools now.";  
+                        console.log('Installation done.');
+                    }
+                }
+            }
+        }
+        binding.send(request);
+    }
+    </script>
+    
+</apex:page>

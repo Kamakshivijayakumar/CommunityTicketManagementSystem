@@ -1,0 +1,37 @@
+<template>
+    <!--<lightning-vertical-navigation>
+        <lightning-vertical-navigation-section label="Nav Bar">
+            <lightning-vertical-navigation-item label="Tickets" name="recent" class="navItemCls"></lightning-vertical-navigation-item>
+            <lightning-vertical-navigation-item label="Dashboard" name="created" class="navItemCls"></lightning-vertical-navigation-item>
+            <lightning-vertical-navigation-item label="Chat Bot" name="private" class="navItemCls"></lightning-vertical-navigation-item>
+            <lightning-vertical-navigation-item label="Settings" name="public" class="navItemCls"></lightning-vertical-navigation-item>
+            <lightning-vertical-navigation-item label="All Reports" name="all" class="navItemCls"></lightning-vertical-navigation-item>
+        </lightning-vertical-navigation-section>
+    </lightning-vertical-navigation> -->
+    <div class="demo-only">
+        <nav class="slds-nav-vertical" aria-label="Sub page">
+            <div class="slds-nav-vertical__section">
+                <h2 id="entity-header" class="slds-nav-vertical__title" style="color: white;">Service Tracker</h2>
+                <ul aria-describedby="entity-header">
+                    <li class="slds-nav-vertical__item slds-is-active" id="Ticket"   onclick={TicketPage}>
+                        <a href="javascript:void(0);"  class="slds-nav-vertical__action" aria-current="true" style="color: white;">Tickets</a>
+                    </li>
+                    <li class="slds-nav-vertical__item " id="Dashboard"  onclick={DashbordPage}>
+                        <a   class="slds-nav-vertical__action" style="color: white;">Dashboard</a>
+                    </li>
+                    <li class="slds-nav-vertical__item" id='ChatBot' onclick={chatBotPage}>
+                        <a href="javascript:void(0);" class="slds-nav-vertical__action" style="color: white;">Chat Bot</a>
+                    </li>
+                    <li class="slds-nav-vertical__item" id="settings" onclick={settingsPage}> 
+                        <a href="javascript:void(0);" class="slds-nav-vertical__action" style="color: white;">Settings</a>
+                    </li>
+                    <!--
+                    <li class="slds-nav-vertical__item" id="AllReports">
+                        <a href="javascript:void(0);" class="slds-nav-vertical__action" style="color: white;">All Reports</a>
+                    </li>
+                -->
+                </ul>
+            </div>
+        </nav>
+    </div>
+</template>

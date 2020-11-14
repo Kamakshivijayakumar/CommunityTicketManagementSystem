@@ -1,0 +1,414 @@
+<template>
+    <!-- Ticket Header Details-->
+    <div class="tktDetailPageHeaderCls">
+        <lightning-layout>
+            <lightning-layout-item  style="margin: 6px 0px 0px 30px" size='2'>
+                <lightning-button-icon   icon-name='standard:home' name='homePage' title="Home Page" variant='brand' onclick={openHomePage}></lightning-button-icon>
+                <lightning-button-icon   icon-name='standard:entitlement' name='ticketPage' style="margin-left: 20px;" title="Ticket Page" variant='brand' onclick={openHomePage}></lightning-button-icon>
+            </lightning-layout-item>
+            <lightning-layout-item style="margin: 6px 10px 10px 390px;">
+                <p style="text-align: center;font-size:19px">{ticketName} </p>
+            </lightning-layout-item>
+        </lightning-layout>
+     </div>
+
+    <lightning-layout>
+            <lightning-layout-item size='3'>
+                <div style="height:33rem;overflow-y:scroll">
+                    <!--  Tickets Details of Selected One -->
+                    <p style='font-size :20px;color:blue;margin:15px 0px 0px 10px;'>About this Ticket</p>
+                    <p style='margin:15px 0px 0px 22px;font-size:15px;'> Name: &nbsp;  &nbsp; {ticketName}</p>
+                    <p style='font-size :15px;margin:15px 0px 0px 9px;'>AsignTo: &nbsp; &nbsp; {ticketFirstName}  &nbsp; {ticketLastName}</p>
+
+                    <!--  Ticket Subject Details -->
+                    <template if:false={isOpenSubjectInputVal}>
+                        <p style='margin:27px 0px 0px 12px;font-size:15px;' onmouseenter={showEditButton} onmouseleave={showOffEditButton} > Subject: &nbsp; &nbsp;{ticketSubjectVal}
+                            <template if:true={isShowSubjectEditButton}>
+                                <a name='subjectVal'  style='margin-left:10px'   onclick={openSubjectInputMethod} >
+                                    <img src={editIcon} style='height:15px;' ></img>
+                                </a>
+                            </template>
+                        </p>
+                        </template>
+
+                    <template if:true={isOpenSubjectInputVal}>
+                        <p style='margin:27px 0px 0px 12px;font-size:15px;'> Subject: &nbsp; 
+                            <lightning-textarea name='subjectVal' value={ticketSubjectVal} style='margin:-60px 37px 0px 60px' onchange={inputSubjectAndDescriptionMethod} ></lightning-textarea>  
+                        </p>
+                    </template>
+
+                    <!--  Ticket Priority Details -->
+                    <lightning-layout style='margin:10px 0px 37px 0px'>
+                        <lightning-layout-item>  
+                            <p style='margin:15px 0px 0px 11px;font-size:15px;'  onmouseenter={showPriorityEditButton} onmouseleave={showOffPriorityEditButton}>Priority: &nbsp;</p>
+                            <template if:false={isOpenPriorityVal}>
+                                <p style='margin:-22px 0px 0px 72px;font-size:15px;' onmouseenter={showPriorityEditButton} onmouseleave={showOffPriorityEditButton} >  &nbsp;{ticketPriorityval}  
+                                    <template if:true={isShowPriorityVal}>
+                                        <a  style='margin-left:10px'   onclick={openPriorityComboboxMethod} >
+                                            <img src={editIcon} style='height:15px;' ></img>
+                                        </a>
+                                    </template>
+                                </p>
+                            </template>
+                        </lightning-layout-item> 
+                        <lightning-layout-item   style=" margin: -12px -78px 0px 6px;" >
+                            <template if:true={isOpenPriorityVal}>
+                                <lightning-combobox name="priority"  value={ticketPriorityval}  placeholder="Select Priority"  options={listPriorityValues} onchange={handleTicketChange}></lightning-combobox>
+                            </template>
+                        </lightning-layout-item>
+                    </lightning-layout>
+
+                    <!--  Ticket Stage Details -->
+                    <lightning-layout style='margin:-30px 0px -55px 0px'>
+                        <lightning-layout-item>
+                            <p style='margin:15px 0px 0px 23px;font-size:15px;' onmouseenter={showStageEditButton} onmouseleave={showOffStageEditButton}> Stage:&nbsp;</p>
+                            <template if:false={isOpenStageVal}>
+                                <p style='margin:-22px 0px 0px 68px;font-size:15px;' onmouseenter={showStageEditButton} onmouseleave={showOffStageEditButton} >&nbsp;{ticketStageVal}  
+                                    <template if:true={isShowStageEditButton}>
+                                        <a  style='margin-left:10px'   onclick={openStageComboboxMethod} >
+                                            <img src={editIcon} style='height:15px;' ></img>
+                                        </a>
+                                    </template>
+                                </p>
+                            </template>
+                        </lightning-layout-item>
+                        <lightning-layout-item   style=" margin: -12px -73px 0px 6px;" >
+                            <template if:true={isOpenStageVal}>
+                                <lightning-combobox name="stage"  value={ticketStageVal}  placeholder="Select Stage" options={listStageValues} onchange={handleTicketChange} ></lightning-combobox>
+                            </template>
+                        </lightning-layout-item>
+                    </lightning-layout>
+
+                    <!--  Ticket  Type Details -->
+                    <lightning-layout style='margin:63px 0px 63px 0px'>
+                        <lightning-layout-item > 
+                            <p style='margin:15px 0px 0px 27px;font-size:15px;' onmouseenter={showTypeEditButton} onmouseleave={showOffTypeEditButton} >Type:&nbsp;</p>
+                                <template if:false={isOpenTypeVal}>
+                                    <p style='margin:-22px 0px 0px 68px;font-size:15px;' onmouseenter={showTypeEditButton} onmouseleave={showOffTypeEditButton} >&nbsp;{ticketTypeVal}  
+                                        <template if:true={isShowTypeEditButton}>
+                                            <a  style='margin-left:10px'   onclick={openTypeComboboxMethod} >
+                                                <img src={editIcon} style='height:15px;' ></img>
+                                            </a>
+                                        </template>
+                                    </p>
+                                </template>
+                        </lightning-layout-item>
+                        <lightning-layout-item   style=" margin: -12px -73px 0px 6px;" >
+                            <template if:true={isOpenTypeVal}>
+                                <lightning-combobox name="type"  value={ticketTypeVal}  placeholder="Select Type" options={listTypeValues} onchange={handleTicketChange} ></lightning-combobox>
+                            </template>
+                        </lightning-layout-item>
+                    </lightning-layout>
+
+                    <!--  Ticket Group Details -->
+                    <lightning-layout style='margin:-48px 0px -48px 0px'>
+                        <lightning-layout-item  > 
+                            <p style='margin:15px 0px 0px 18px;font-size:15px;' onmouseenter={showGroupEditButton} onmouseleave={showOffGroupEditButton}> Group:&nbsp;</p>
+                            <template if:false={isOpenGroupVal}>
+                                <p style='margin:-22px 0px 0px 68px;font-size:15px;' onmouseenter={showGroupEditButton} onmouseleave={showOffGroupEditButton} >&nbsp;{ticketGroupVal}  
+                                    <template if:true={isShowGroupEditButton}>
+                                        <a  style='margin-left:10px'   onclick={openGroupComboboxMethod} >
+                                            <img src={editIcon} style='height:15px;' ></img>
+                                        </a>
+                                    </template>
+                                </p>
+                            </template>
+                        </lightning-layout-item>
+                        <lightning-layout-item   style=" margin: -12px -73px 0px 6px;" >
+                            <template if:true={isOpenGroupVal}>
+                                <lightning-combobox name="group"  value={ticketGroupVal} placeholder="Select Group" options={listGroupValues} onchange={handleTicketChange} ></lightning-combobox>
+                            </template>
+                            </lightning-layout-item>
+                    </lightning-layout>
+
+
+                    <!--  Ticket Description Details -->
+                    <template if:false={isOpenDescriptionInputVal}>
+                        <p style='margin:90px 0px 0px 12px;font-size:15px;' onmouseenter={showDescriptionButton} onmouseleave={showOffDescriptionButton} > Description:&nbsp;&nbsp;{ticketDescriptionVal}
+                            <template if:true={isShowDescriptionEditButton}>
+                                <a name='subjectVal'  style='margin-left:10px'   onclick={openDescriptionInputMethod} >
+                                    <img src={editIcon} style='height:15px;' ></img>
+                                </a>
+                            </template>
+                        </p>    
+                    </template>
+                    <template if:true={isOpenDescriptionInputVal}>
+                        <p style='margin:90px 0px 0px 12px;font-size:15px;'> Description:&nbsp;
+                            <lightning-textarea name='descriptionVal' value={ticketDescriptionVal} style='margin:-59px 37px 0px 88px' onchange={inputSubjectAndDescriptionMethod} ></lightning-textarea>             
+                        </p>
+                    </template>
+                </div>
+
+                <!--  Ticket Update and Cancel Button  -->
+                <lightning-button label='Update' name='Update' style="margin-left: 66px;" variant='brand'  disabled={isShowUpdateAndCancelButton} onclick={updateTicketMethod}></lightning-button>
+                <lightning-button label='Cancel' name='Cancel' style="margin-left: 36px;" variant='brand'   disabled={isShowUpdateAndCancelButton} onclick={cancelUpdateTicketMethod}></lightning-button>
+            </lightning-layout-item>
+
+
+
+            <lightning-layout-item style='margin-left:20px'>
+
+                <!-- Ticket Related tabs like Email, Attachment,Task,Note -->
+                <div class="demo-only" style=" margin-bottom: 10px;">
+                    <div class="slds-tabs_default">
+                        <ul class="slds-tabs_default__nav" role="tablist">
+                            <li class="slds-tabs_default__item slds-is-active" id='email' title="Emails" role="presentation" style="font-size: 15px;margin-left:69px; " >
+                                <a class="slds-tabs_default__link" href="javascript:void(0);"  onclick={openEmailTab} role="tab" tabindex="0" aria-selected="true" >
+                                    <span class="slds-tabs__left-icon">
+                                        <span class="slds-icon_container " title="Email">
+                                        </span>
+                                        <lightning-icon icon-name='standard:email' style='background-color:#00639f' size='small'></lightning-icon>
+                                    </span>
+                                    Emails
+                                </a>
+                            </li>
+
+                            <li class="slds-tabs_default__item "  id='attachment' title="Attachment" role="presentation" style='margin-left:73px; font-size:15px;'>
+                                <a class="slds-tabs_default__link" href="javascript:void(0);" onclick={openAttachmentTab} role="tab" tabindex="-1" aria-selected="false">
+                                    <span class="slds-tabs__left-icon">
+                                        <span class="slds-icon_container " title="Attachment">
+                                            <img src={attachmentIcon} style='height:25px'>        
+                                        </span>
+                                        </span>
+                                    Attachment
+                                </a>
+                            </li>
+
+
+                            <li class="slds-tabs_default__item "  id='note' title="Note" role="presentation" style='margin-left:81px; font-size:15px;'>
+                                <a class="slds-tabs_default__link" href="javascript:void(0);"  onclick={openNoteTab}  role="tab" tabindex="-1" aria-selected="false" >
+                                    <span class="slds-tabs__left-icon">
+                                        <span class="slds-icon_container " title="Note">
+                                            <lightning-icon icon-name='standard:note' style='background-color:#00639f' size='small'></lightning-icon>
+                                        </span>
+                                    </span>
+                                    Note
+                                </a>
+                            </li>
+                               <!--  
+                            <li class="slds-tabs_default__item "  id='task' title="Task" role="presentation" style='margin-left:77px; font-size:15px;'>
+                                <a class="slds-tabs_default__link" href="javascript:void(0);" onclick={openTaskTab}   role="tab" tabindex="-1" aria-selected="false">
+                                    <span class="slds-tabs__left-icon">
+                                        <span class="slds-icon_container " title="Task">
+                                            <lightning-icon icon-name='standard:task' style='background-color:#00639f' size='small'></lightning-icon>
+                                        </span>
+                                    </span>
+                                    Task
+                                </a>
+                            </li>  -->
+                        </ul>
+                    </div>
+                </div>
+
+
+                 <!-- Ticket Email Tabs Details-->
+                <template if:false={isEmailDetailsOpen}>
+                    <div class="slds-clearfix">
+                        <div class="slds-float_right"> 
+                            <lightning-button label='Create Email' name='createEmail' style='margin-right:41px' variant='brand'  onclick={openCreateEmailMthod}></lightning-button>
+                        </div>
+                    </div>
+                    <!-- Popup for New Email-->
+                    <template if:true={isShowEmailForm}>
+                        <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+                            <div class="slds-modal__container">
+                                <!-- Modal/Popup Box LWC header here -->
+                                <header class="slds-modal__header">
+                                    <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse"  title="Close" onclick={closeModal}>
+                                        <lightning-icon icon-name="utility:close" alternative-text="close" variant="brand" size="small" ></lightning-icon>
+                                        <span class="slds-assistive-text">Close</span>
+                                    </button>
+                                    <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate "> Create New Mail</h2>
+                                </header>
+                                <!-- Modal/Popup Box LWC body starts here -->
+                                <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                                    <lightning-input  name="email" label='Email' type='email' value={toEmailVal}  onchange={inputValueForEmail} required  placeholder="Email like (abc@email.com)"></lightning-input>
+                                    <lightning-input  label='Subject' name="subject"  value={emailSubjectVal} onchange={inputValueForEmail} required  placeholder="Subject"></lightning-input>
+                                    <p>Body</p>          
+                                    <lightning-input-rich-text label="Boby" name="body" value={emailBobyVal} onchange={inputValueForEmail} required ></lightning-input-rich-text> 
+                                    <div class="slds-align_absolute-center slds-p-around_medium">
+                                        <lightning-button style='margin:5px' name='Send' label='Send' variant='brand' onclick={sendEmailMethodCall} ></lightning-button>
+                                        <lightning-button  style='margin:5px' name='Canel' label='Canel' variant='brand' onclick={cancelEmailMethodCall}></lightning-button>
+                                    </div>        
+                                </div>
+                            </div>
+                        </section>
+                        <div class="slds-backdrop slds-backdrop_open"></div>
+                    </template>
+
+                    <template if:false={isShowlistOfEmailForTicket}>
+                        <div class="slds-scrollable_y" style="height:28rem;width:60rem;">
+
+                            <template for:each={listOfEmailForTicket} for:item='email'>
+                                <div  key={email} style="margin:15px 0px 0px 50px;">
+                                    <div class="emailListCss">
+                                        <lightning-icon icon-name='standard:email' style='background-color:#00639f;height:25px;margin:5px' size='small'></lightning-icon>
+                                        <div style="font-size: 15px;color:blue;margin-top:-27px;margin-left:33px">Email</div>
+                                        <div style="margin:-27px 27px 0px 0px;font-size:12px;;text-align:right">{email.CreatedDate}</div>
+                                        <div style='margin:19px 0px 0px 28px'>Subject: {email.Subject}</div>
+                                        <div style='margin:15px 0px 0px 28px'>Body: {email.TextBody}</div>
+                                         <div style='margin:10px 0px 0px 15px' >
+                                            <div>
+                                              From:<lightning-icon icon-name='standard:avatar' style='height:25px;margin:5px' size='small'></lightning-icon>
+                                             {email.FromAddress}
+                                             </div>
+                                            <div style="margin: -40px 0px 0px 581px;">
+                                             To: <lightning-icon icon-name='standard:avatar' style='height:25px;margin:5px' size='small'></lightning-icon>
+                                             {email.ToAddress}
+                                            </div>
+                                         </div>
+                                    </div>
+                                </div>
+                            </template>
+                        </div>
+                     </template>
+                    <template if:true={isShowlistOfEmailForTicket}>
+                        <p style='margin:10px 10px 10px 257px;overflow-y:scroll;height:28rem;width:44rem;'>NO EMAILS UNDER THIS TICKE </p>
+                    </template>
+                </template>
+
+
+                <!-- Ticket Attachment Tabs Details-->
+                <template if:true={isAttachmentDetailsOpen}>
+                     <div class="slds-clearfix">
+                        <div class="slds-float_right" style="margin-left: 50px;">
+                            <lightning-file-upload   name="newAttachment"  style='margin-right:41px' accept={acceptedFormats} record-id={ticketId} onuploadfinished={handleUploadAttachmentIsFinished} > </lightning-file-upload>
+                    </div>
+                        </div>
+                        
+                    <template if:true={isShowListAttachments}>
+                        <lightning-layout horizontal-align="end" style="font-size: 18px;">
+                            <div class="attachListCls" style=" margin:20px 0px 10px 0px">
+                                <lightning-layout-item size='6' style=" margin: 10px 0px 0px 10px; ">Title </lightning-layout-item>
+                                <lightning-layout-item size='2'  style=" margin: 10px 10px 0px -18px; ">FileType </lightning-layout-item>
+                                <lightning-layout-item size='2' style=" margin: 10px 0px 0px 0px; ">Owner  </lightning-layout-item>
+                                <lightning-layout-item size='2' style=" margin: 10px 0px 0px 0px; "> size(bytes) </lightning-layout-item>
+                             </div>
+                        </lightning-layout>
+
+
+                        <template for:each={attachmentListPerPage} for:item='attach'>
+                            <lightning-layout horizontal-align="end" key={attach}  style="font-size:14px; margin-bottom:10px;margin-right:0px">
+                                <div class="attachListCls">
+                                    <lightning-layout-item  size="6" style='margin: 10px 0px 0px 3px' >
+                                        <lightning-icon icon-name="doctype:attachment" alternative-text="Attach" title="Attach"></lightning-icon>
+                                        <a data-value={attach.ContentDocumentId} onclick={openAttachmentFile} target="_self" style="text-align: center;">{attach.Title}</a>
+                                    </lightning-layout-item>
+                                    <lightning-layout-item size='2'>  {attach.FileType}  </lightning-layout-item>
+                                    <lightning-layout-item size='2'>{attach.CreatedBy.Name} </lightning-layout-item> 
+                                    <lightning-layout-item size='2'>   {attach.ContentSize} </lightning-layout-item>
+                                    <lightning-button-icon   icon-name="action:delete" icon-position="right"  style='margin:5px 0px 0px 5px;' variant="brand"   value={attach.ContentDocumentId}   onclick={deletedAttachment}></lightning-button-icon>
+                                </div>
+                            </lightning-layout>
+                        </template>
+
+                        <lightning-layout  class="slds-m-top_large">
+                            <lightning-layout-item size="10" margin="around-small" flexibility="auto">
+                                <div class="slds-align_absolute-center">
+                                    <ul class="slds-button-group-row">
+                                        <template if:true={hasPrev}>
+                                            <button class="slds-button slds-button_neutral"  style='margin-right:10px' onclick ={onPrev}> prev </button>
+                                        </template>
+                                        <template for:each={pagesList} for:item= "pageNumber">
+                                            <div key={pageNumber} style='margin-right:10px'>
+                                                <button data-id={pageNumber} class="slds-button slds-button_neutral"  onclick={onPageClick}>{pageNumber}</button>
+                                            </div>
+                                        </template>
+                                        <template if:true={hasNext}>
+                                            <button class="slds-button slds-button_neutral" onclick={onNext}>next</button>
+                                        </template>
+                                    </ul>
+                                </div>
+                            </lightning-layout-item>
+                        </lightning-layout>
+
+                    </template>
+                    <template if:false={isShowListAttachments}>
+                        <p style='margin:10px 10px 10px 257px;overflow-y:scroll;height:28rem;width:44rem;'>   NO ATTACHMENT UNDER THIS TICKET    </p>
+                    </template>
+                </template>
+
+                <!-- Ticket Note Tabs Details-->
+                <template if:true={isNoteDetailsOpen}>
+
+                    <template if:false={isShowNoteInput}>
+                        <div class="slds-clearfix">
+                            <div class="slds-float_right"  style='margin-right:50px'> 
+                                <lightning-button label='Add Note' name='addNote'  variant='brand'  onclick={showNoteInput}></lightning-button>
+                        </div>
+                            </div>
+                    </template>
+
+                    <template if:true={isShowNoteInput}>
+                        <lightning-layout>
+                            <lightning-layout-item>
+                                <lightning-textarea style='width:640px;margin: -5px 0px 0px 19px;' placeholder='Please Add note ' value={noteValue} onchange={getNoteInputValue} ></lightning-textarea>
+                            </lightning-layout-item>
+                            <lightning-layout-item style='margin: 24px 0px 0px 15px;'>
+                                <lightning-button label='Save' variant='brand'  style="margin-right:5px" onclick={saveNoteValue}></lightning-button>
+                                <lightning-button label='Cancel' variant='brand'  onclick={closeNoteInputFiled}></lightning-button>
+                             </lightning-layout-item>
+                         </lightning-layout>
+                     </template>
+                    <template if:true={isShowListNotes}>
+                        <div class="slds-scrollable_y" style="height:28rem;width:60rem;">
+                            <template for:each={listNoteforTicket} for:item='note'>
+                                <div  class="notesListCls"  key={note} style="margin:15px 0px 0px 50px;">
+                                    <lightning-icon icon-name='standard:avatar' style='height:25px;margin:5px' size='small'></lightning-icon>
+                                    <p style="margin: -28px 0px 0px 33px; ">{ticketFirstName}  &nbsp; {ticketLastName}</p>
+                                     <p style="margin: -27px 27px 0px 0px;text-align:right;font-size:12px">{note.CreatedDate}</p>
+                                    <p style="margin: 15px 0px 0px 32px;">{note.note__c}</p>
+                                 </div>
+                            </template>
+                         </div>
+                    </template>
+                    <template if:false={isShowListNotes}>
+                        <p style='margin:10px 10px 10px 257px;overflow-y:scroll;height:28rem;width:44rem;'>   NO NOTES UNDER THIS TICKET    </p>
+                     </template>
+
+                 </template>
+
+
+                <!-- Ticket Task Tabs Details-->
+                <template if:true={istaskDetailsOpen}>
+                     
+                    <div class="slds-clearfix">
+                        <div class="slds-float_right"> 
+                             <lightning-button label='New Task' style='margin-right:41px' name='newTask' variant='brand' ></lightning-button>
+                         </div>
+                     </div>
+
+                </template>
+
+
+
+                <template if:true={isShowAttachmentval}>
+
+                    <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+                        <div class="slds-modal__container ">
+                            <!-- Modal/Popup Box LWC header here -->
+                            <header class="slds-modal__header">
+                                <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse"  title="Close" onclick={closeModal}>
+                                    <lightning-icon icon-name="utility:close" alternative-text="close"  variant="brand" size="small" ></lightning-icon>
+                                    <span class="slds-assistive-text">Close</span>
+                                 </button>
+                                <h2 id="modal-heading" class="slds-text-heading_medium slds-hyphenate "> DOWNLOAD ATTACHMENT</h2>
+                             </header>
+                            <!-- Modal/Popup Box LWC body starts here -->
+                            <div class="slds-modal__content  slds-modal__content1 slds-p-around_medium" id="modal-content-id">
+                                <p style="margin-left:226px;margin-bottom:10px; font-size:15px;">  No preview available</p>
+                                <a href={attachmentDownloadUrl}>
+                                    <lightning-button label='Download' style='margin:10px 0px 0px 240px '  variant="brand" value={attachmentDownloadUrl}></lightning-button>
+                                </a>
+                                <div class="slds-align_absolute-center slds-p-around_medium"  style='margin-top:132px;'>
+                                    <lightning-button  style='margin:5px' name='Canel' label='Canel'  onclick={closeModal}></lightning-button>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                    <div class="slds-backdrop slds-backdrop_open"></div>
+                </template>
+            </lightning-layout-item>
+         </lightning-layout>
+
+ </template>

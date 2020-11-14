@@ -1,0 +1,383 @@
+ <template>
+
+    <lightning-layout style='margin-left:1px;'>
+        <lightning-layout-item flexibility="auto" size="2">
+            <div class="verticalNavCls">
+                <c-vertical-navigation-cmp></c-vertical-navigation-cmp>
+            </div>
+        </lightning-layout-item>
+
+        <lightning-layout-item size="10">
+            <div class="tktPageHeaderCls">
+                <lightning-layout>
+                    <lightning-layout-item size='10' >
+                        <p style="text-align: center;"> TICKETS </p>
+                    </lightning-layout-item>
+
+                    <!--  Button for  new ticket of a Project-->
+                    <lightning-layout-item  style="margin: 6px 0px 0px -30px">
+                        <lightning-button style="margin-right:23px;" label='New Ticket' name='newTicket' variant='brand' onclick={newTicketMethod}></lightning-button>
+                        <lightning-button-icon   icon-name='standard:home' name='homePage' title="Home Page" variant='brand' onclick={openHomePage}></lightning-button-icon>
+                    </lightning-layout-item>
+                </lightning-layout>
+            </div>
+
+            <!-- code for search bar and new ticket in page-->
+            <!--   Search bar for  searching ticket under the project -->
+            <lightning-layout  style="margin-top: 15px;">
+                    <lightning-layout-item size="2" style="margin-top: -15px;margin-left:27px" >
+
+                        <div class="slds-clearfix">
+                            <div class="slds-float_left">
+                                <lightning-input   type='Search' name='searchTicket'  value={searchingTickets} onchange={searchingTicketMethod} placeholder='Search the Tickets...' ></lightning-input>
+                                <!--  Button for clearing the search result-->
+                                <!--
+                                <lightning-button style="margin:3px" label='clear' name='clear' variant='brand' onclick={clearingSearchResult} ></lightning-button>
+                                -->
+                            </div>
+                        </div>
+                </lightning-layout-item>
+
+                <!-- Filter  for Owner Names-->
+                <lightning-layout-item size="3" style="margin-left: 25px;">
+
+                    <div class="select-box-owner" onclick={openOnwerFilter} >
+                        <div class="options-container-owner" style="position: absolute;display: block;width: 210px;text-align: left;" >
+                            <lightning-layout style=' margin-top:-24px;'>
+                                <lightning-layout-item >
+                                    <lightning-input type='search' style='color:black; margin-top:45px;' value={searchOwnerVal} placeholder="Search Owners" onchange={getOwnerBySearch} ></lightning-input>
+                                </lightning-layout-item>
+                                <lightning-layout-item size="3" style='margin-top:65px; margin-left:15px' >
+                                    <lightning-button-icon icon-name='utility:refresh'  variant='brand' onclick={refreshOwnerFilter}></lightning-button-icon>
+                                </lightning-layout-item>
+                                </lightning-layout>
+                            <template if:true={listOfOwner}>
+                                <template for:each={listOfOwner} for:item="item">
+                                    <div class="option-owner" key={item}   style='text-transform: capitalize;'>
+                                        <input type="checkbox" value={item.Id} checked={item.isCheck} onchange={getListFilteredOwner}/>&nbsp;{item.FirstName}   &nbsp; {item.LastName}
+                                    </div> 
+                                </template>
+                            </template>
+
+                            <template if:false={listOfOwner}>
+                                <p class="noTicketCls">No Owner Found  To Display</p>
+                             </template>
+                        </div>
+
+                        <div class="selected-owner" >
+                            <template if:false={isSelectOnwerItem}>
+                                <p style="text-align:center;">Filter AssignTo  Users </p>
+                            </template>
+                            <template if:true={isSelectOnwerItem} >
+                            <p  style='text-transform: capitalize;text-align:center;'>{firstItemInOwnerselectList}</p>
+                            </template>    
+                        </div>
+                    </div>
+                </lightning-layout-item>
+
+
+                <!--Filter for Priority Values-->
+                <lightning-layout-item size="3" style="margin-left: -42px;">
+
+                    <div class="select-box-priority" onclick={openPriotiyFilter} >
+                        <div class="options-container-priority" style="position: absolute;display: block;width: 210px;text-align: left;" >
+                            <lightning-layout style=' margin-top:-24px;'>
+                                <lightning-layout-item size="9">
+                                    <lightning-input type='search' style='color:black; margin-top:45px;' value={searchProrityVal} placeholder="Search Owners" onchange={getPriorityBySearch} ></lightning-input>
+                                </lightning-layout-item>
+                                <lightning-layout-item size="3" style='margin-top:65px; margin-left:15px' >
+                                    <lightning-button-icon icon-name='utility:refresh'  variant='brand' onclick={refreshPriorityFilter}></lightning-button-icon>
+                                </lightning-layout-item>
+                                </lightning-layout>
+                            <template if:true={itemsOfPriorityList}>
+                                <template for:each={itemsOfPriorityList} for:item="item">
+                                    <div class="option-priority" key={item}   style='text-transform: capitalize;'>
+                                        <input type="checkbox" value={item.value} checked={item.isCheck} onchange={getListCheckPriorityVal}/>&nbsp;{item.value}  
+                                    </div> 
+                                </template>
+                            </template>
+
+                            <template if:false={itemsOfPriorityList}>
+                                <p class="noTicketCls">No Priority Found  To Display</p>
+                            </template>
+                        </div>
+                        <div class="selected-priority" >
+                            <template if:false={isSelectPriorityItem}>
+                                <p style="text-align:center;"> Filter Priority</p>
+                            </template>
+                            <template if:true={isSelectPriorityItem} >
+                                <p  style='text-transform: capitalize;text-align:center;'>{firstItemInPrioritySelectList}</p>
+                            </template>
+                        </div>
+                    </div>
+                    </lightning-layout-item>
+
+
+                    <lightning-layout-item size="3" style="margin-left: -45px;" >
+                        <div class="select-box-stage" onclick={openStageFilter} >
+                            <div class="options-container-stage" style="position: absolute;display: block;width: 210px;text-align: left;" >
+                                <lightning-layout style=' margin-top:-24px;'>
+                                    <lightning-layout-item size="9">
+                                            <lightning-input type='search' style='color:black; margin-top:45px;' value={searchStageVal} placeholder="Search Stage" onchange={getStageBySearch} ></lightning-input>
+                                        </lightning-layout-item>
+                                        <lightning-layout-item size="3" style='margin-top:65px; margin-left:15px' >
+                                            <lightning-button-icon icon-name='utility:refresh'  variant='brand' onclick={refreshStageFilter}></lightning-button-icon>
+                                        </lightning-layout-item>
+                                     </lightning-layout>
+                                <template if:true={listStageValues}>
+                                    <template for:each={listStageValues} for:item="item">
+                                        <div class="option-stage" key={item}   style='text-transform: capitalize;'>
+                                            <input type="checkbox" value={item.value} checked={item.isCheck} onchange={getListCheckStageVal}/>&nbsp;{item.value}  
+                                        </div> 
+                                    </template>
+                                </template>
+
+                                <template if:false={listStageValues}>
+                                    <p class="noTicketCls">No Stage Found  To Display</p>
+                                </template>
+                            </div>
+                            <div class="selected-stage" >
+                                <template if:false={isSelectStageItem}> 
+                                    <p style="text-align:center;"> Filter Stage</p>
+                                </template>
+                                <template if:true={isSelectStageItem} >
+                                    <p  style='text-transform: capitalize;text-align:center;'>{firstItemInStageSelectList}</p>
+                                </template>
+                            </div>
+                        </div>
+                    </lightning-layout-item>
+
+                    <lightning-layout-item > 
+                        <div>
+                            <lightning-button label='More Filters' name='More Filters' variant="brand" onclick={openMoreFilters}></lightning-button>
+                        </div>
+                    </lightning-layout-item>
+            </lightning-layout>
+
+
+            <template if:true={ticketsSizeFlag}>
+                <h1 class="noTicketCls">NO TICKETS UNDER THIS PROJECT</h1>
+            </template>
+            <template if:true={searchticketsSizeFlag}>
+                <h1 class="noTicketCls">NO TICKETS FOUND TO DISPLAY</h1>
+            </template>
+
+            <!-- Code end-->
+            <template if:false={ticketsSizeFlag}>
+                <template if:false={searchticketsSizeFlag}>
+                        <lightning-layout style='margin-left:10px;'>
+                            <lightning-layout-item>
+                                <lightning-layout horizontal-align="end" >
+                                    <div class="ticketTileClass" style="font-size: 18px;">
+                                        <lightning-layout-item  size='3' style=" margin: 15px 0px 0px 15px; ">Name </lightning-layout-item>
+                                        <lightning-layout-item  size='2'  style=" margin: 15px 0px 0px 0px; ">Assign To </lightning-layout-item>
+                                        <lightning-layout-item  size='2' style=" margin: 15px 0px 0px 0px; ">Priority </lightning-layout-item>
+                                        <lightning-layout-item   size='2' style=" margin: 15px 0px 0px 0px; ">Stage </lightning-layout-item>
+                                        <lightning-layout-item  size='2' style=" margin: 10px 0px 0px 0px; ">Group </lightning-layout-item>
+                                        <lightning-layout-item  size='2' style=" margin: 15px 0px 0px 0px; ">Type </lightning-layout-item>
+                                    </div>
+                                </lightning-layout>
+                                <template for:each={ticketListPerPage} for:item="tktObj">
+                                    <lightning-layout horizontal-align="end" key={tktObj.Id}>
+                                        <div class="ticketTileClass" >
+                                        <lightning-layout-item  size="3" style='margin-top: 15px;margin-left:15px' >
+                                            <lightning-icon icon-name="standard:task" alternative-text="Ticket" title="Ticket"></lightning-icon>
+                                            <a class="ticketLinkCls" onclick={handleTicketLinkClick} data-item={tktObj.Name} target="_self">{tktObj.Name}</a>
+                                        </lightning-layout-item>
+                                        <lightning-layout-item size='2' style='margin-top: 15px;'>  {tktObj.AssignTo__r.FirstName} &nbsp; {tktObj.AssignTo__r.LastName} </lightning-layout-item>
+                                        <lightning-layout-item size='2' style='margin-top: 15px;'>{tktObj.Priority__c} </lightning-layout-item>
+                                        <lightning-layout-item size='2' style='margin-top: 15px;'>   {tktObj.Stage__c} </lightning-layout-item>
+                                        <lightning-layout-item size='2' style='margin-top: 15px;'>{tktObj.Group__c} </lightning-layout-item>
+                                        <lightning-layout-item style='margin-top: 15px;' >   {tktObj.Type__c} </lightning-layout-item>
+                                        </div>
+                                    </lightning-layout>
+                                </template>
+
+                                <!-- Page List For a Tickets-->
+                                <template if:false={searchticketsSizeFlag}> 
+                                    <lightning-layout horizontal-align="end" class="slds-m-top_large">
+                                        <lightning-layout-item size="10" margin="around-small" flexibility="auto">
+                                            <div class="slds-align_absolute-center">
+                                                <ul class="slds-button-group-row">
+                                                    <template if:true={hasPrev}>
+                                                        <li class="slds-button-group-item" >
+                                                            <button class="slds-button slds-button_neutral" onclick ={onPrev}> prev </button>
+                                                        </li>
+                                                        </template>
+                                                        <template for:each={pagesList} for:item= "pageNumber">
+                                                            <li class="slds-button-group-item" key={pageNumber}>
+                                                            <button data-id={pageNumber} class="slds-button slds-button_neutral" onclick={onPageClick}>{pageNumber}</button>
+                                                            </li>
+                                                        </template>
+                                                        <template if:true={hasNext}>
+                                                            <li class="slds-button-group-item" >
+                                                                <button class="slds-button slds-button_neutral" onclick={onNext} >next</button>
+                                                            </li>
+                                                    </template>
+                                                </ul>
+                                            </div>
+                                        </lightning-layout-item>
+                                    </lightning-layout>
+
+                                </template>
+                            </lightning-layout-item>
+                    </lightning-layout>
+                </template>
+            </template>
+
+
+            <!--Model view for New Ticket-->
+            <template if:true={newTicketFlag}>
+                <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+                    <div class="slds-modal__container">
+                        <!-- Modal/Popup Box LWC header here -->
+                        <header class="slds-modal__header">
+                        <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse"  title="Close" onclick={closeModal}>
+                            <lightning-icon icon-name="utility:close" alternative-text="close" variant="brand" size="small" ></lightning-icon>
+                            <span class="slds-assistive-text">Close</span>
+                        </button>
+                        <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate "> Create New Ticket</h2>
+                        </header>
+                        <!-- Modal/Popup Box LWC body starts here -->
+                        <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                            <lightning-record-edit-form object-api-name='Ticket__c' columns="2" onsuccess={saveTicket} onload={handleLoadSpinner}>
+                                <template if:true={isLoading}>
+                                    <lightning-spinner style='height:10px;width:10px;margin: 292px 0px 0px 284px;' variant="brand" size="large"></lightning-spinner>
+                                </template>
+                                <div class="slds-grid">
+                                    <div class="slds-col slds-size_1-of-2">
+                                        <lightning-input-field field-name="Subject__c" ></lightning-input-field>
+                                        <lightning-input-field field-name="AssignTo__c" required></lightning-input-field>
+                                        <lightning-input-field field-name="Project__c" value={projectIds.Id} ></lightning-input-field>
+                                        <lightning-input-field field-name="Description__c"></lightning-input-field>
+                                    </div>
+                                    <div class="slds-col slds-size_1-of-2">
+                                        <lightning-input-field field-name="Stage__c"></lightning-input-field>
+                                        <lightning-input-field field-name="Priority__c"></lightning-input-field>
+                                        <lightning-input-field field-name="Group__c"></lightning-input-field>
+                                        <lightning-input-field field-name="Type__c"></lightning-input-field>
+                                    </div>
+                                </div>
+                                <div class="slds-align_absolute-center slds-p-around_medium">
+                                    <lightning-button style='margin:5px' name='Save' label='Save' variant='brand' type='submit' ></lightning-button>
+                                    <lightning-button  style='margin:5px' name='Canel' label='Canel' variant='brand' onclick={closeModal}></lightning-button>
+                                </div>
+                            </lightning-record-edit-form>
+        
+                        </div>
+                    </div>
+                </section>
+                <div class="slds-backdrop slds-backdrop_open"></div>
+            </template>
+
+            <!--Model view for More Filter-->
+            <template if:true={isOpenMoreFilters}>
+                <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+                    <div class="slds-modal__container ">
+                        <!-- Modal/Popup Box LWC header here -->
+                        <header class="slds-modal__header">
+                            <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse"  title="Close" onclick={closeModal}>
+                                <lightning-icon icon-name="utility:close" alternative-text="close"   variant="brand"  size="small" ></lightning-icon>
+                                <span class="slds-assistive-text">Close</span>
+                            </button>
+                            <h2 id="modal-heading" class="slds-text-heading_medium slds-hyphenate ">Filters</h2>
+                        </header>
+                        <!-- Modal/Popup Box LWC body starts here -->
+                        <div class="slds-modal__content  slds-modal__content1 slds-p-around_medium" id="modal-content-id">
+
+                            <!-- Filter for Group -->
+                            <div class="slds-clearfix">
+                                <div class="slds-float_right">
+                                    <div class="select-box-group" onclick={openGroupFilter} style="margin:0px 144px 0px 0px">
+
+                                        <div class="options-container-group" style="position: absolute;display: block;width: 210px;text-align: left;" >
+                                            <lightning-layout>
+                                            <lightning-layout-item size="9">
+                                                <lightning-input type='search' style='color:black; margin-top:45px;' value={searchGroupVal} placeholder="Search Group" onchange={getGroupBySearch} ></lightning-input>
+                                            </lightning-layout-item>
+                                            <lightning-layout-item size="3" style='margin-top:65px; margin-left:15px' >
+                                                <lightning-button-icon icon-name='utility:refresh'  variant='brand' onclick={refreshGroupFilter}></lightning-button-icon>
+                                            </lightning-layout-item>
+                                            </lightning-layout>
+                                            <template if:true={listGroupValues}>
+                                                <template for:each={listGroupValues} for:item="item">
+                                                    <div class="option-group" key={item}   style='text-transform: capitalize;'>
+                                                        <input type="checkbox" value={item.value} checked={item.isCheck} onchange={getListCheckGroupVal}/>{item.value}  
+                                                    </div> 
+                                                </template>
+                                            </template>
+
+                                            <template if:false={listGroupValues}>
+                                                <p class="noTicketCls">No Group Found  To Display</p>
+                                            </template>
+                                        </div>
+
+                                        <div class="selected-group" >
+                                            <template if:false={isSelectGroupItem}>
+                                                <p style="text-align:center;"> Filter Group</p>
+                                             </template>
+                                            <template if:true={isSelectGroupItem} >
+                                                <p  style='text-transform: capitalize;text-align:center;'>{firstItemInGroupSelectList}</p>
+                                            </template>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+
+                                <!-- Filter for Type-->
+                                <div class="slds-clearfix">
+                                    <div class="slds-float_right">
+                                        <div class="select-box-type" onclick={openTypeFilter} style="margin:-45px 360px 0px 0px">
+
+                                            <div class="options-container-type" style="position: absolute;display: block;width: 210px;text-align: left;" >
+                                                <lightning-layout>
+                                                    <lightning-layout-item size="9">
+                                                        <lightning-input type='search' style='color:black; margin-top:45px;' value={searchTypeVal} placeholder="Search Type" onchange={getTypeBySearch} ></lightning-input>
+                                                    </lightning-layout-item>
+                                                    <lightning-layout-item size="3" style='margin-top:65px; margin-left:15px' >
+                                                        <lightning-button-icon icon-name='utility:refresh'  variant='brand' onclick={refreshTypeFilter}></lightning-button-icon>
+                                                    </lightning-layout-item>
+                                                </lightning-layout>
+                                                <template if:true={listTypeValues}>
+                                                    <template for:each={listTypeValues} for:item="item">
+                                                        <div class="option-type" key={item}   style='text-transform: capitalize;' >
+                                                            <input type="checkbox" value={item.value} checked={item.isCheck} onchange={getListCheckTypeVal}/>{item.value}  
+                                                        </div> 
+                                                    </template>
+                                                </template>
+
+                                                <template if:false={listTypeValues}>
+                                                    <p class="noTicketCls">No Type Found  To Display</p>
+                                                </template>
+                                            </div>
+
+                                            <div class="selected-type" >
+                                                <template if:false={isSelectTypeItem}>
+                                                    <p style='text-align:center;'>Filter Type</p>
+                                                </template>
+                                                <template if:true={isSelectTypeItem} >
+                                                    <p  style='text-transform: capitalize;text-align:center;'>{firstItemInTypeSelectList}</p>
+                                                </template>
+                                            </div>
+                                    </div>
+                                </div>
+                            </div>
+
+
+
+                            <div class="slds-align_absolute-center slds-p-around_medium"  style='margin-top:132px;'>
+
+                                <lightning-button style='margin:5px' name='Apply' label='Apply' variant='brand' onclick={applyFilter} ></lightning-button>
+                                <lightning-button  style='margin:5px' name='Cancel' label='Cancel' variant='brand' onclick={cancelModal}></lightning-button>
+                             </div>
+                        </div>
+                    </div>
+                </section>
+                <div class="slds-backdrop slds-backdrop_open"></div>
+            </template>
+
+
+        </lightning-layout-item>
+    </lightning-layout>
+ </template>
